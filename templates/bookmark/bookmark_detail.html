@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookmark Detail - {{ object.title }}</title>
+</head>
+<body>
+    <h1>{{ object.title }}</h1>
+    <p>URL: <a href="{{ object.url }}" target="_blank">{{ object.url }}</a></p>
+    <p><a href="{% url 'bookmark:index' %}">Go to Bookmark List</a></p>
+</body>
+</html>

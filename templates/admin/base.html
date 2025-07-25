@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+<style>
+    /*
+    .branding-and-home {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* 'Django 관리'와 버튼 사이 간격 */
+    }
+    .home-link-button {
+        background-color: #007bff; /* Bootstrap primary 색상 */
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+        font-size: 0.9em; /* 폰트 크기 조절 */
+    }
+    */
+</style>
+{% endblock %}
+
+{% block branding %}
+    <div class="branding-and-home" style="display: flex; align-items: center; gap: 15px;"> {# flexbox로 정렬 #}
+        <h1 id="site-name"><a href="{% url 'admin:index' %}">Django 관리</a></h1>
+        {# "웹사이트 홈으로" 링크를 'Django 관리' 옆으로 옮깁니다. #}
+        <a href="{% url 'home:index' %}" class="home-link-button" style="background-color: #007bff; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; white-space: nowrap; font-size: 0.9em;">
+            메인 페이지
+        </a>
+    </div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %} {# 기존의 '사이트 보기' 링크를 비활성화합니다. #}

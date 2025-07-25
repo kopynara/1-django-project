@@ -1,0 +1,91 @@
+{% extends 'base.html' %} {# base.html 템플릿을 상속받습니다. #}
+{% load static %} {# 정적 파일을 사용하기 위해 로드합니다. #}
+
+{% block title %}Bookmark List{% endblock %} {# 페이지 제목을 Bookmark List로 설정합니다. #}
+
+{% block content %} {# base.html의 content 블록에 이 내용을 삽입합니다. #}
+    <div class="container my-4">
+        <h1 class="mb-4">북마크 목록</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-8">
+                {# 검색 폼 #}
+                <form class="d-flex" role="search" action="{% url 'bookmark:search' %}" method="get">
+                    <input class="form-control me-2" type="search" placeholder="검색어를 입력하세요..." aria-label="Search" name="q" value="{{ search_query }}">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                {# 정렬 옵션 드롭다운 #}
+                <div class="input-group">
+                    <label class="input-group-text" for="sortSelect">정렬</label>
+                    <select class="form-select" id="sortSelect" onchange="location = this.value;">
+                        <option value="{% url 'bookmark:index' %}?sort=created_at&order=desc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'created_at' and current_order == 'desc' %}selected{% endif %}>
+                            최신순
+                        </option>
+                        <option value="{% url 'bookmark:index' %}?sort=title&order=asc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'title' and current_order == 'asc' %}selected{% endif %}>
+                            제목 (오름차순)
+                        </option>
+                        <option value="{% url 'bookmark:index' %}?sort=title&order=desc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'title' and current_order == 'desc' %}selected{% endif %}>
+                            제목 (내림차순)
+                        </option>
+                        <option value="{% url 'bookmark:index' %}?sort=url&order=asc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'url' and current_order == 'asc' %}selected{% endif %}>
+                            URL (오름차순)
+                        </option>
+                        <option value="{% url 'bookmark:index' %}?sort=url&order=desc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'url' and current_order == 'desc' %}selected{% endif %}>
+                            URL (내림차순)
+                        </option>
+                        <option value="{% url 'bookmark:index' %}?sort=category__name&order=asc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'category__name' and current_order == 'asc' %}selected{% endif %}>
+                            카테고리 (오름차순)
+                        </option>
+                        <option value="{% url 'bookmark:index' %}?sort=category__name&order=desc{% if search_query %}&q={{ search_query }}{% endif %}"
+                            {% if current_sort_by == 'category__name' and current_order == 'desc' %}selected{% endif %}>
+                            카테고리 (내림차순)
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {% if object_list %} {# object_list는 BookmarkListView에서 전달받는 북마크 객체 목록입니다. #}
+            <div class="list-group"> {# Bootstrap 리스트 그룹 스타일 적용 #}
+                {% for bookmark in object_list %} {# 각 북마크 객체를 순회합니다. #}
+                    <a href="{{ bookmark.url }}" target="_blank" class="list-group-item list-group-item-action flex-column align-items-start mb-2 rounded-3 shadow-sm">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ bookmark.title }}
+                                {% if bookmark.is_favorite %} {# 즐겨찾기라면 별 아이콘 표시 #}
+                                    <i class="fas fa-star text-warning ms-2"></i>
+                                {% endif %}
+                            </h5> {# 북마크 제목 #}
+                            <small class="text-muted">
+                                {% if bookmark.category %} {# 카테고리가 있다면 표시 #}
+                                    <span class="badge bg-secondary me-2">{{ bookmark.category.name }}</span>
+                                {% endif %}
+                                {{ bookmark.updated_at|date:"Y.m.d" }} {# 수정일 #}
+                            </small>
+                        </div>
+                        {# 썸네일 이미지 추가 #}
+                        {% if bookmark.thumbnail_url %}
+                            <img src="{{ bookmark.thumbnail_url }}" alt="{{ bookmark.title }} 썸네일" class="img-fluid rounded me-3" style="max-width: 100px; max-height: 100px; float: left;">
+                        {% endif %}
+                        <p class="mb-1 text-break">{{ bookmark.url }}</p> {# 북마크 URL #}
+                        {% if bookmark.description %} {# description 필드가 있다면 표시 #}
+                            <small class="text-muted">{{ bookmark.description|truncatechars:100 }}</small> {# 설명/메모 #}
+                        {% endif %}
+                        <div class="clearfix"></div> {# float 해제 #}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                저장된 북마크가 없습니다.
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}
