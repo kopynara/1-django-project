@@ -53,9 +53,9 @@
             </div>
         </div>
 
-        {% if object_list %} {# object_list는 BookmarkListView에서 전달받는 북마크 객체 목록입니다. #}
+        {% if bookmarks %} {# 뷰에서 context_object_name을 'bookmarks'로 설정했으므로, object_list 대신 'bookmarks'를 사용합니다. #}
             <div class="list-group"> {# Bootstrap 리스트 그룹 스타일 적용 #}
-                {% for bookmark in object_list %} {# 각 북마크 객체를 순회합니다. #}
+                {% for bookmark in bookmarks %} {# 각 북마크 객체를 순회합니다. #}
                     <a href="{{ bookmark.url }}" target="_blank" class="list-group-item list-group-item-action flex-column align-items-start mb-2 rounded-3 shadow-sm">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{ bookmark.title }}
@@ -82,6 +82,44 @@
                     </a>
                 {% endfor %}
             </div>
+
+            {# 페이지네이션 컨트롤 시작 #}
+            {% if is_paginated %} {# 페이지네이션이 적용된 경우에만 표시 #}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {# 이전 페이지 버튼 #}
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort_by %}&sort={{ current_sort_by }}&order={{ current_order }}{% endif %}">이전</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">이전</span>
+                            </li>
+                        {% endif %}
+
+                        {# 페이지 번호들 #}
+                        {% for i in page_range %}
+                            <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                                <a class="page-link" href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort_by %}&sort={{ current_sort_by }}&order={{ current_order }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+
+                        {# 다음 페이지 버튼 #}
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort_by %}&sort={{ current_sort_by }}&order={{ current_order }}{% endif %}">다음</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">다음</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+            {# 페이지네이션 컨트롤 끝 #}
+
         {% else %}
             <div class="alert alert-info" role="alert">
                 저장된 북마크가 없습니다.
