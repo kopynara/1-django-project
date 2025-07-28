@@ -12,7 +12,7 @@
             {% if post.modify_dt %} | <i class="fas fa-edit"></i> 수정일: {{ post.modify_dt|date:"Y.m.d H:i" }}{% endif %}
         </p>
 
-        {# 태그 표시 섹션 시작 #}
+        {# 태그 표시 섹션 #}
         {% if post.tags.all %} {# 게시물에 태그가 있다면 #}
             <div class="tags-section mb-4"> {# 태그 섹션에 아래쪽 마진을 추가합니다. #}
                 <i class="fas fa-tags me-1"></i>
@@ -31,11 +31,44 @@
             {{ post.content|safe }} {# 게시물 내용을 HTML 태그를 포함하여 안전하게 표시합니다. #}
         </div>
 
-        <div class="d-flex justify-content-between align-items-center"> {# 버튼들을 양쪽 끝으로 정렬 #}
+        <div class="d-flex justify-content-between align-items-center mb-5"> {# 버튼들을 양쪽 끝으로 정렬 #}
             <a href="{% url 'blog:index' %}" class="btn btn-secondary">목록으로 돌아가기</a> {# 목록으로 돌아가는 버튼 #}
             {# 이전/다음 게시물 링크 (필요시 추가) #}
             {# <a href="#" class="btn btn-outline-primary">이전 글</a> #}
             {# <a href="#" class="btn btn-outline-primary">다음 글</a> #}
         </div>
+
+        {# Disqus 댓글 섹션 시작 #}
+        <hr class="my-5"> {# 구분선 추가 #}
+        <h2 class="mb-4">댓글</h2>
+        <div id="disqus_thread"></div> {# Disqus 댓글 위젯이 로드될 위치 #}
+        <script>
+            /**
+             * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+             * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+             */
+            var disqus_config = function () {
+                // this.page.url: 현재 페이지의 고유 URL을 설정합니다.
+                // Django의 get_absolute_url 메서드를 사용하여 현재 게시물의 절대 URL을 가져옵니다.
+                this.page.url = "{{ request.build_absolute_uri }}";
+                
+                // this.page.identifier: 현재 페이지의 고유 식별자를 설정합니다.
+                // 블로그 게시물의 slug를 사용하여 고유성을 확보합니다.
+                this.page.identifier = "{{ post.slug }}";
+                
+                // this.page.title: 현재 페이지의 제목을 설정합니다. (선택 사항)
+                this.page.title = "{{ post.title }}";
+            };
+            
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document, s = d.createElement('script');
+                s.src = 'https://kopynara.disqus.com/embed.js'; // 여기에 네 Disqus shortname이 포함된 URL이 정확히 들어갑니다.
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        {# Disqus 댓글 섹션 끝 #}
+
     </div>
 {% endblock content %}

@@ -62,7 +62,6 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/admin/">Admin</a></li>
-                            {# 아래 두 줄을 활성화하여 Archive와 Tag Cloud 링크를 추가합니다. #}
                             <li><a class="dropdown-item" href="{% url 'blog:post_archive' %}">Archive</a></li>
                             <li><a class="dropdown-item" href="{% url 'blog:tag_cloud' %}">Tag Cloud</a></li>
                             {# <li><a class="dropdown-item" href="{% url 'blog:search' %}">Search</a></li> #} {# Search는 메인 검색창으로 대체하므로 제거 #}
@@ -119,19 +118,23 @@
     <!-- Custom JavaScript -->
     <script src="{% static 'js/main.js' %}"></script>
 
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/68870ddb4870571920641f61/1j17os8ec';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/68870ddb4870571920641f61/1j17os8ec';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
+
+    <!--Start of Disqus Comment Count Script-->
+    <script id="dsq-count-scr" src="https://kopynara.disqus.com/count.js" async></script>
+    <!--End of Disqus Comment Count Script-->
 
 </body>
 </html>
