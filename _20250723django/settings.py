@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-import os
 from pathlib import Path
+import os # os 모듈 임포트 (MEDIA_ROOT 설정에 필요)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-21ja+wcxrntdhv15+441f6zuf^+i*mf60=(g1z5vy&7k2uir5t'
+SECRET_KEY = 'django-insecure-@e02c52n(g9+v&p0^h3#%e#f2%n_d=w@p75^o3#*w^3a68+3c&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'taggit',
-    'home',
-    'bookmark',
-    'blog',
-    'photo',
+    'taggit', # django-taggit 앱 등록
+    'home.apps.HomeConfig', # home 앱 등록
+    'bookmark.apps.BookmarkConfig', # bookmark 앱 등록
+    'blog.apps.BlogConfig', # blog 앱 등록
+    'photo.apps.PhotoConfig', # photo 앱 등록 (PhotoConfig 클래스 사용)
 ]
 
 MIDDLEWARE = [
@@ -60,11 +60,11 @@ ROOT_URLCONF = '_20250723django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'], # 프로젝트 전체 템플릿 폴더 추가 (pathlib 스타일)
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug', # 추가 또는 확인
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -109,28 +109,33 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko-kr'
+LANGUAGE_CODE = 'ko-kr' # 한국어로 설정
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = 'Asia/Seoul' # 서울 시간대로 설정
 
 USE_I18N = True
 
-USE_TZ = True # <-- True로 변경 (권장)
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static',] # STATICFILES_DIRS 설정 (pathlib 스타일)
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# Media files (User uploaded files)
+# 사용자가 업로드한 파일을 위한 설정
+MEDIA_URL = '/media/' # 웹에서 미디어 파일에 접근할 URL 접두사
+MEDIA_ROOT = BASE_DIR / 'media' # 업로드된 파일이 저장될 실제 파일 시스템 경로 (pathlib 스타일)
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 로그인 성공 후 리다이렉트될 URL (인증 기능 구현 시 사용)
+# LOGIN_REDIRECT_URL = '/' # 홈페이지로 리다이렉트
+# LOGOUT_REDIRECT_URL = '/' # 로그아웃 후 홈페이지로 리다이렉트
+

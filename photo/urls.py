@@ -1,11 +1,13 @@
-# _20250723dj/_20250723django/photo/urls.py
 from django.urls import path
-# from django.http import HttpResponse # 기존에 있던 이 줄은 이제 필요 없으므로 삭제하거나 주석 처리합니다.
-from django.views.generic import TemplateView # TemplateView를 사용하기 위해 import 합니다.
+from .views import PhotoLV, PhotoDV # PhotoLV (List View), PhotoDV (Detail View) 임포트
 
-app_name = 'photo'
+app_name = 'photo' # 이 앱의 네임스페이스를 'photo'로 설정
 
 urlpatterns = [
-    # 'photo/' 경로로 접속했을 때, photo/photo_list.html 템플릿을 렌더링하도록 설정합니다.
-    path('', TemplateView.as_view(template_name='photo/photo_list.html'), name='index'),
+    # 사진 목록 페이지: /photo/
+    path('', PhotoLV.as_view(), name='index'),
+    
+    # 사진 상세 페이지: /photo/사진ID/
+    # Photo 모델의 get_absolute_url 메서드에서 id를 사용하므로, 여기에 <int:pk>를 사용합니다.
+    path('<int:pk>/', PhotoDV.as_view(), name='detail'),
 ]

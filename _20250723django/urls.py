@@ -1,9 +1,24 @@
-from django.contrib import admin
-from django.urls import path, include
+"""
+URL configuration for _20250723django project.
 
-from django.conf import settings
-from django.conf.urls.static import static
-import os
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path, include # include 함수 임포트
+from django.conf import settings # settings를 사용하기 위해 임포트
+from django.conf.urls.static import static # static 함수를 사용하기 위해 임포트
+import os # os 모듈 임포트 (STATIC_ROOT 설정에 필요)
 
 urlpatterns = [
     # Django 관리자 페이지 URL
@@ -22,8 +37,10 @@ urlpatterns = [
     path('photo/', include('photo.urls')),
 ]
 
+# 개발 환경에서만 미디어 파일과 정적 파일을 서빙하도록 설정
+# DEBUG가 True일 때만 static() 함수를 사용하여 MEDIA_URL 및 STATIC_URL에 대한 요청을 처리
 if settings.DEBUG:
-    # 미디어 파일 서빙 설정
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     # 정적 파일 서빙 설정 (STATICFILES_DIRS를 사용하도록)
     urlpatterns += static(settings.STATIC_URL, document_root=os.path.join(settings.BASE_DIR, 'static'))
+
