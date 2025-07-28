@@ -12,6 +12,13 @@
                 {% for photo in photos %} {# 각 사진 객체를 순회합니다. #}
                     <div class="col">
                         <div class="card h-100 shadow-sm rounded-3"> {# 카드 스타일 적용 #}
+                            {# --- 디버그 라인 시작 --- #}
+                            <p style="color: red; font-weight: bold;">
+                                DEBUG: photo.image = {{ photo.image }}<br>
+                                DEBUG: photo.image.url = {{ photo.image.url }}
+                            </p>
+                            {# --- 디버그 라인 끝 --- #}
+
                             <a href="{% url 'photo:detail' pk=photo.id %}"> {# 사진 클릭 시 상세 페이지로 이동 #}
                                 {% if photo.image %}
                                     {# 이미지 비율 유지를 위해 object-fit 사용 #}
