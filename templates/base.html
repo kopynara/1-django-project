@@ -62,7 +62,9 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/admin/">Admin</a></li>
+                            {# 아래 두 줄을 활성화하여 Archive와 Tag Cloud 링크를 추가합니다. #}
                             <li><a class="dropdown-item" href="{% url 'blog:post_archive' %}">Archive</a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:tag_cloud' %}">Tag Cloud</a></li>
                             {# <li><a class="dropdown-item" href="{% url 'blog:search' %}">Search</a></li> #} {# Search는 메인 검색창으로 대체하므로 제거 #}
                         </ul>
                     </li>
