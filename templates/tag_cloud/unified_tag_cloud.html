@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {# base.html 템플릿을 상속받습니다. #}
 {% load static %} {# 정적 파일을 사용하기 위해 로드합니다. #}
 
-{% block title %}통합 태그 클라우드{% endblock %} {# 페이지 제목을 설정합니다. #}
+{% block title %}통합 태그 클라우드{% endblock %} {# 페이지 제목을 통합 태그 클라우드로 설정합니다. #}
 
 {% block content %} {# base.html의 content 블록에 이 내용을 삽입합니다. #}
     <div class="container my-4">
@@ -11,15 +11,35 @@
             <div class="d-flex flex-wrap justify-content-center"> {# 태그들을 유연하게 배치하고 가운데 정렬 #}
                 {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
                     {# 각 태그에 대한 링크를 생성합니다. #}
-                    {# 현재는 블로그 태그 목록으로 연결하지만, 나중에 통합 태그 목록 뷰로 변경할 수 있습니다. #}
-                    <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}" 
-                       class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
-                       style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
-                        {{ tag.name }} 
-                        <span class="small">({{ tag.num_items }})</span> {# 전체 항목 수 표시 #}
-                        {% if tag.num_blog_posts > 0 %}<span class="small">(블로그: {{ tag.num_blog_posts }})</span>{% endif %}
-                        {% if tag.num_photos > 0 %}<span class="small">(사진: {{ tag.num_photos }})</span>{% endif %}
-                    </a>
+                    {# 블로그 게시물과 사진 모두에 연결된 태그는 블로그 링크를 우선하고, 사진만 있는 경우 사진 링크를 사용합니다. #}
+                    {% if tag.num_blog_posts > 0 %}
+                        {# 블로그 게시물 태그 링크 #}
+                        <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}" 
+                           class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
+                           style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
+                            {{ tag.name }} 
+                            <span class="small">({{ tag.num_items }})</span> {# 전체 항목 수 표시 #}
+                            {% if tag.num_blog_posts > 0 %}<span class="small">(블로그: {{ tag.num_blog_posts }})</span>{% endif %}
+                            {% if tag.num_photos > 0 %}<span class="small">(사진: {{ tag.num_photos }})</span>{% endif %}
+                        </a>
+                    {% elif tag.num_photos > 0 %}
+                        {# 사진 태그 링크 (블로그 게시물이 없는 경우) #}
+                        <a href="{% url 'photo:photo_list_by_tag' tag_slug=tag.slug %}" 
+                           class="badge bg-success text-white me-2 mb-2 p-2 rounded-pill" 
+                           style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
+                            {{ tag.name }} 
+                            <span class="small">({{ tag.num_items }})</span> {# 전체 항목 수 표시 #}
+                            {% if tag.num_blog_posts > 0 %}<span class="small">(블로그: {{ tag.num_blog_posts }})</span>{% endif %}
+                            {% if tag.num_photos > 0 %}<span class="small">(사진: {{ tag.num_photos }})</span>{% endif %}
+                        </a>
+                    {% else %}
+                        {# 연결된 항목이 없는 태그 (이 경우는 발생하지 않아야 함) #}
+                        <span class="badge bg-secondary text-white me-2 mb-2 p-2 rounded-pill" 
+                              style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;">
+                            {{ tag.name }} 
+                            <span class="small">({{ tag.num_items }})</span>
+                        </span>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% else %}
