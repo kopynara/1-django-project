@@ -63,8 +63,8 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/admin/">Admin</a></li>
                             <li><a class="dropdown-item" href="{% url 'blog:post_archive' %}">Archive</a></li>
-                            {# 'tag_cloud'는 'blog' 앱에 있으므로 'blog:tag_cloud'로 수정 #}
-                            <li><a class="dropdown-item" href="{% url 'blog:tag_cloud' %}">Tag Cloud</a></li>
+                            {# 'tag_cloud' 앱으로 이동했으므로 'tag_cloud:index'로 수정 #}
+                            <li><a class="dropdown-item" href="{% url 'tag_cloud:index' %}">Tag Cloud</a></li>
                             {# Photo Tag Cloud는 통합되었으므로 제거하거나 주석 처리 #}
                             {# <li><hr class="dropdown-divider"></li> #}
                             {# <li><a class="dropdown-item" href="{% url 'photo:tag_cloud' %}">Photo Tag Cloud</a></li> #}

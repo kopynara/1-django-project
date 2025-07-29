@@ -10,9 +10,6 @@ urlpatterns = [
     # /blog/post/ (게시물 목록 페이지, index와 동일)
     path('post/', views.PostListView.as_view(), name='post_list'), 
     
-    # /blog/post/django-example/ (slug 기반 상세 페이지)
-    re_path(r'^post/(?P<slug>[-\w]+)/$', views.PostDetailView.as_view(), name='post_detail'), 
-    
     # /blog/archive/ (최근 게시물 아카이브)
     path('archive/', views.PostAV.as_view(), name='post_archive'), 
     
@@ -28,14 +25,15 @@ urlpatterns = [
     # /blog/today/ (오늘 날짜 아카이브)
     path('today/', views.PostTAV.as_view(), name='post_today_archive'), 
     
-    # /blog/tag/ (태그 클라우드)
-    path('tag/', views.TagCloudTV.as_view(), name='tag_cloud'), 
+    # /blog/search/ (검색 페이지)
+    path('search/', views.SearchFV.as_view(), name='search'), 
     
     # /blog/tag/tagname/ (특정 태그 게시물 목록)
     # 기존 path('<slug:tag_slug>/', ...) 대신 re_path를 사용하여 유니코드 문자를 허용합니다.
-    # [-\w]+는 유니코드 단어 문자(한글 포함), 숫자, 하이픈, 언더스코어를 모두 매칭합니다.
-    re_path(r'^tag/(?P<tag_slug>[-\w]+)/$', views.PostListView.as_view(), name='post_list_by_tag'), 
+    # [-\w\uAC00-\uD7A3]+는 유니코드 단어 문자(한글 포함), 숫자, 하이픈, 언더스코어를 모두 매칭합니다.
+    re_path(r'^tag/(?P<tag_slug>[-\w\uAC00-\uD7A3]+)/$', views.PostListView.as_view(), name='post_list_by_tag'), 
     
-    # /blog/search/ (검색 페이지)
-    path('search/', views.SearchFV.as_view(), name='search'), 
+    # /blog/post/django-example/ (slug 기반 상세 페이지)
+    # 이 패턴은 다른 구체적인 패턴들(예: archive, tag) 뒤에 위치해야 합니다.
+    re_path(r'^post/(?P<slug>[-\w]+)/$', views.PostDetailView.as_view(), name='post_detail'), 
 ]

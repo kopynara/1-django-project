@@ -36,7 +36,7 @@ urlpatterns = [
     # 'photo/' 경로를 photo 앱의 urls.py로 전달
     path('photo/', include('photo.urls')),
 
-    # 'tagcloud/' 경로를 새로 생성한 tag_cloud 앱의 urls.py로 전달
+    # 'tagcloud/' 경로를 tag_cloud 앱의 urls.py로 전달 (새로 추가)
     path('tagcloud/', include('tag_cloud.urls')),
 ]
 
@@ -46,4 +46,3 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     # 정적 파일 서빙 설정 (STATICFILES_DIRS를 사용하도록)
     urlpatterns += static(settings.STATIC_URL, document_root=os.path.join(settings.BASE_DIR, 'static'))
-
