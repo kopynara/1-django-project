@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from blog.models import Post # Post 모델 임포트
+from photo.models import Photo # Photo 모델 임포트 (TagCloudTV에서 사진 개수를 세기 위해)
 from taggit.models import Tag # Tag 모델 임포트 (django-taggit에서 제공)
-from django.db import models # <-- 이 줄을 추가합니다. (models.Count 사용을 위해)
-from django.db.models import Q # 검색 기능을 위해 Q 객체 임포트
+from django.db import models # models.Count 사용을 위해 임포트
+from django.db.models import Q, Count # Q 객체 및 Count 함수 임포트
 from django.utils import timezone # PostTAV 뷰에서 오늘 날짜를 가져오기 위해 임포트
 
 class PostListView(ListView):
@@ -67,7 +68,7 @@ class PostAV(ListView):
 # PostYAV (Year Archive View): 특정 연도의 게시물 목록을 보여줍니다.
 class PostYAV(ListView):
     model = Post
-    template_name = 'blog/post_archive.html'
+    template_name = 'blog/post_archive.html' # post_archive.html 재사용
     context_object_name = 'posts'
     date_field = 'created_at'
     paginate_by = 10
@@ -80,13 +81,13 @@ class PostYAV(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['date_list'] = Post.objects.dates('created_at', 'year', order='DESC')
-        context['year'] = self.kwargs['year']
+        context['year'] = self.kwargs['year'] # 현재 연도 전달
         return context
 
 # PostMAV (Month Archive View): 특정 월의 게시물 목록을 보여줍니다.
 class PostMAV(ListView):
     model = Post
-    template_name = 'blog/post_archive.html'
+    template_name = 'blog/post_archive.html' # post_archive.html 재사용
     context_object_name = 'posts'
     date_field = 'created_at'
     paginate_by = 10
@@ -159,17 +160,23 @@ class PostTAV(ListView):
 
 # TagCloudTV (Tag Cloud View): 모든 태그를 보여줍니다.
 class TagCloudTV(ListView):
-    template_name = 'taggit/taggit_cloud.html'
+    template_name = 'tag_cloud/unified_tag_cloud.html' # 템플릿 경로를 tag_cloud 앱의 것으로 명시
     context_object_name = 'tags'
 
     def get_queryset(self):
-        return Tag.objects.all()
+        # 모든 태그를 가져오고, 각 태그에 연결된 Post 객체와 Photo 객체의 수를 계산합니다.
+        # 'post'는 Post 모델의 기본 related_name, 'photo'는 Photo 모델의 기본 related_name입니다.
+        # TaggableManager의 related_name이 명시적으로 지정되지 않았다면 이 이름들을 사용합니다.
+        return Tag.objects.annotate(
+            num_blog_posts=Count('post'),  # Post 모델과의 관계를 통해 게시물 수 계산
+            num_photos=Count('photo')      # Photo 모델과의 관계를 통해 사진 수 계산
+        ).order_by('-num_blog_posts', '-num_photos') # 블로그 게시물 수, 그 다음 사진 수 기준으로 정렬
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 각 태그의 사용 횟수를 계산하여 'tags' 리스트에 추가합니다.
-        tags_with_counts = Tag.objects.annotate(num_times=models.Count('taggit_taggeditem_items'))
-        context['tags'] = tags_with_counts
+        # taggit_cloud.html에서 num_items를 사용하므로, num_blog_posts와 num_photos를 합쳐서 제공
+        for tag in context['tags']:
+            tag.num_items = tag.num_blog_posts + tag.num_photos
         return context
 
 # SearchFV (Search Form View): 검색 결과를 보여줍니다.

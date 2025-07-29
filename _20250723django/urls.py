@@ -35,6 +35,9 @@ urlpatterns = [
 
     # 'photo/' 경로를 photo 앱의 urls.py로 전달
     path('photo/', include('photo.urls')),
+
+    # 'tagcloud/' 경로를 새로 생성한 tag_cloud 앱의 urls.py로 전달
+    path('tagcloud/', include('tag_cloud.urls')),
 ]
 
 # 개발 환경에서만 미디어 파일과 정적 파일을 서빙하도록 설정

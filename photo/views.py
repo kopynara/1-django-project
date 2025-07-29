@@ -1,7 +1,8 @@
 from django.views.generic import ListView, DetailView # ListView와 DetailView 임포트
 from .models import Photo # Photo 모델 임포트
-from taggit.models import Tag # Tag 모델 임포트 (django-taggit에서 제공)
+from taggit.models import Tag # Tag 모델 임포트 (taggit 사용을 위해)
 from django.db import models # models.Count 사용을 위해 임포트
+from django.db.models import Q, Count # Q 객체 및 Count 함수 임포트 (Q는 검색, Count는 집계에 필요)
 
 # Photo 목록을 보여주는 클래스 기반 뷰 (ListView)
 class PhotoLV(ListView):
@@ -47,21 +48,16 @@ class PhotoDV(DetailView):
 
 # Photo 태그 클라우드 뷰 (모든 태그를 보여줌)
 class PhotoTagCloudTV(ListView):
-    template_name = 'photo/photo_tag_cloud.html' # 렌더링할 템플릿 파일 경로
+    template_name = 'photo/photo_tag_cloud.html' # 렌더링할 템플릿 파일 경로 (이 템플릿은 직접 생성해야 합니다)
     context_object_name = 'tags' # 템플릿에서 태그 목록을 'tags'로 접근
 
     def get_queryset(self):
-        # 모든 태그를 가져옵니다.
-        return Tag.objects.all()
+        # 모든 태그를 가져오고, 각 태그에 연결된 Photo 객체의 수를 계산합니다.
+        # 'photo'는 Photo 모델의 기본 related_name입니다.
+        return Tag.objects.annotate(num_times=Count('photo')).order_by('-num_times')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 각 태그의 사용 횟수를 계산하여 'tags' 리스트에 추가합니다.
-        # 'taggit_taggeditem_items'는 TaggedItem 모델의 related_name입니다.
-        # 이 필드명은 taggit 라이브러리의 버전에 따라 다를 수 있으므로,
-        # 만약 오류가 발생하면 `python manage.py shell`에서 Tag._meta.get_field('tagged_items').related_query_name()
-        # 또는 Tag._meta.get_field('tagged_items').related_name을 확인해야 할 수 있습니다.
-        # 일반적으로는 'taggit_taggeditem_items' 또는 'tagged_items' 입니다.
-        tags_with_counts = Tag.objects.annotate(num_times=models.Count('taggit_taggeditem_items'))
-        context['tags'] = tags_with_counts
+        # num_times를 템플릿에서 사용하기 위해 추가합니다.
+        # 이 부분은 get_queryset에서 이미 처리되었으므로 추가적인 로직은 필요 없습니다.
         return context

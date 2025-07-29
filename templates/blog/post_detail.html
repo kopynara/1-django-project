@@ -17,7 +17,8 @@
             <div class="tags-section mb-4"> {# 태그 섹션에 아래쪽 마진을 추가합니다. #}
                 <i class="fas fa-tags me-1"></i>
                 {% for tag in post.tags.all %} {# 각 태그를 순회합니다. #}
-                    {# 태그 클릭 시 해당 태그가 달린 게시물 목록으로 이동하는 링크 (URL 이름 post_list_by_tag로 변경) #}
+                    {# 태그 클릭 시 해당 태그가 달린 게시물 목록으로 이동하는 링크 #}
+                    {# 'blog:post_tag_list'를 'blog:post_list_by_tag'로 변경합니다. #}
                     <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}"
                        class="badge bg-info text-dark me-1 mb-1 rounded-pill">
                         {{ tag.name }}

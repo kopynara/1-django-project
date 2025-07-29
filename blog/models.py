@@ -24,14 +24,13 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'post' # 단수 별칭
         verbose_name_plural = 'posts' # 복수 별칭
-        db_table = 'my_post' # 데이터베이스 테이블 이름 지정
-        ordering = ('-created_at',) # 기본 정렬 순서
+        db_table = 'my_post' # 데이터베이스 테이블 이름 지정 (기존 'blog_posts'에서 'my_post'로 변경)
+        ordering = ('-created_at',) # 기본 정렬 순서 (최신 생성일 기준 내림차순으로 변경)
 
     def __str__(self):
         return self.title # 객체를 문자열로 표현할 때 title 필드를 반환
 
     def get_absolute_url(self):
-        # blog:detail -> blog:post_detail로 변경
         return reverse('blog:post_detail', args=(self.slug,)) # slug 기반 URL (URL 패턴 이름 'post_detail'로 변경)
 
     def get_previous_post(self):
