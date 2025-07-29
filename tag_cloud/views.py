@@ -1,11 +1,12 @@
 from django.views.generic import ListView
 from taggit.models import Tag # Tag 모델 임포트
 from django.db.models import Count, Q, F # Count, Q, F 함수 임포트
-from blog.models import Post # Post 모델 임포트
-from photo.models import Photo # Photo 모델 임포트
+from blog.models import Post # Post 모델 임포트 (블로그 게시물 수 계산을 위해)
+from photo.models import Photo # Photo 모델 임포트 (사진 수 계산을 위해)
 
 # 통합 태그 클라우드 뷰
 class UnifiedTagCloudTV(ListView):
+    # model = Tag # Tag 모델을 직접 사용하지 않고, 쿼리셋에서 Tag 객체를 생성하므로 주석 처리합니다.
     template_name = 'tag_cloud/unified_tag_cloud.html' # 렌더링할 템플릿 파일 경로
     context_object_name = 'tags' # 템플릿에서 태그 목록을 'tags'로 접근
 
@@ -26,3 +27,10 @@ class UnifiedTagCloudTV(ListView):
         ).filter(num_items__gt=0).order_by('-num_items') # 하나라도 연결된 태그만 표시하고, 전체 아이템 수 기준으로 내림차순 정렬
 
         return tags_with_counts
+    
+    # get_context_data는 이제 필요하지 않습니다. num_items가 쿼리셋에 이미 추가되었습니다.
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     for tag in context['tags']:
+    #         tag.num_items = tag.num_blog_posts + tag.num_photos
+    #     return context

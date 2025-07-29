@@ -5,42 +5,48 @@
 
 {% block content %} {# base.html의 content 블록에 이 내용을 삽입합니다. #}
     <div class="container my-4">
-        <h1 class="mb-4">통합 태그 클라우드</h1>
+        {# 제목을 "TAG CLOUD"로 변경 #}
+        <h1 class="mb-4 text-center">TAG CLOUD</h1> {# 제목을 가운데 정렬합니다. #}
 
         {% if tags %} {# views.py에서 전달받은 'tags' 객체가 있다면 #}
-            <div class="d-flex flex-wrap justify-content-center"> {# 태그들을 유연하게 배치하고 가운데 정렬 #}
-                {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
-                    {# 각 태그에 대한 링크를 생성합니다. #}
-                    {# 블로그 게시물과 사진 모두에 연결된 태그는 블로그 링크를 우선하고, 사진만 있는 경우 사진 링크를 사용합니다. #}
-                    {% if tag.num_blog_posts > 0 %}
-                        {# 블로그 게시물 태그 링크 #}
-                        <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}" 
-                           class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
-                           style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
-                            {{ tag.name }} 
-                            <span class="small">({{ tag.num_items }})</span> {# 전체 항목 수 표시 #}
-                            {% if tag.num_blog_posts > 0 %}<span class="small">(블로그: {{ tag.num_blog_posts }})</span>{% endif %}
-                            {% if tag.num_photos > 0 %}<span class="small">(사진: {{ tag.num_photos }})</span>{% endif %}
-                        </a>
-                    {% elif tag.num_photos > 0 %}
-                        {# 사진 태그 링크 (블로그 게시물이 없는 경우) #}
-                        <a href="{% url 'photo:photo_list_by_tag' tag_slug=tag.slug %}" 
-                           class="badge bg-success text-white me-2 mb-2 p-2 rounded-pill" 
-                           style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
-                            {{ tag.name }} 
-                            <span class="small">({{ tag.num_items }})</span> {# 전체 항목 수 표시 #}
-                            {% if tag.num_blog_posts > 0 %}<span class="small">(블로그: {{ tag.num_blog_posts }})</span>{% endif %}
-                            {% if tag.num_photos > 0 %}<span class="small">(사진: {{ tag.num_photos }})</span>{% endif %}
-                        </a>
-                    {% else %}
-                        {# 연결된 항목이 없는 태그 (이 경우는 발생하지 않아야 함) #}
-                        <span class="badge bg-secondary text-white me-2 mb-2 p-2 rounded-pill" 
-                              style="font-size: {{ tag.num_items|add:10 }}px; min-width: 80px; text-align: center;">
-                            {{ tag.name }} 
-                            <span class="small">({{ tag.num_items }})</span>
-                        </span>
-                    {% endif %}
-                {% endfor %}
+            <div class="row"> {# 블로그 태그와 사진 태그 박스를 나란히 두기 위한 row #}
+                {# 블로그 태그 박스 #}
+                <div class="col-md-6 mb-4"> {# 중간 크기 화면 이상에서 2열로 배치 #}
+                    <div class="card h-100 shadow-sm rounded-3 p-3"> {# 카드 스타일 적용 #}
+                        <h3 class="card-title text-primary mb-3">블로그 태그</h3> {# 블로그 태그 섹션 제목 #}
+                        <div class="d-flex flex-wrap"> {# 태그들을 유연하게 배치 #}
+                            {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
+                                {% if tag.num_blog_posts > 0 %} {# 블로그 게시물에 연결된 태그만 표시 #}
+                                    <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}" 
+                                       class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
+                                       style="font-size: {{ tag.num_blog_posts|add:10 }}px; min-width: 80px; text-align: center;"> {# 블로그 게시물 수에 따라 폰트 크기 조절 #}
+                                        {{ tag.name }} 
+                                        <span class="small">({{ tag.num_blog_posts }})</span> {# 블로그 게시물 수 표시 #}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {# 사진 태그 박스 #}
+                <div class="col-md-6 mb-4"> {# 중간 크기 화면 이상에서 2열로 배치 #}
+                    <div class="card h-100 shadow-sm rounded-3 p-3"> {# 카드 스타일 적용 #}
+                        <h3 class="card-title text-success mb-3">사진 태그</h3> {# 사진 태그 섹션 제목 #}
+                        <div class="d-flex flex-wrap"> {# 태그들을 유연하게 배치 #}
+                            {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
+                                {% if tag.num_photos > 0 %} {# 사진에 연결된 태그만 표시 #}
+                                    <a href="{% url 'photo:photo_list_by_tag' tag_slug=tag.slug %}" 
+                                       class="badge bg-success text-white me-2 mb-2 p-2 rounded-pill" 
+                                       style="font-size: {{ tag.num_photos|add:10 }}px; min-width: 80px; text-align: center;"> {# 사진 수에 따라 폰트 크기 조절 #}
+                                        {{ tag.name }} 
+                                        <span class="small">({{ tag.num_photos }})</span> {# 사진 수 표시 #}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         {% else %}
             <div class="alert alert-info" role="alert">
