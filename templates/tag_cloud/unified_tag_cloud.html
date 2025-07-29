@@ -5,8 +5,8 @@
 
 {% block content %} {# base.html의 content 블록에 이 내용을 삽입합니다. #}
     <div class="container my-4">
-        {# 제목을 "TAG CLOUD"로 변경 #}
-        <h1 class="mb-4 text-center">TAG CLOUD</h1> {# 제목을 가운데 정렬합니다. #}
+        {# 제목을 "TAG CLOUD"로 변경하고 가운데 정렬 #}
+        <h1 class="mb-4 text-center">TAG CLOUD</h1>
 
         {% if tags %} {# views.py에서 전달받은 'tags' 객체가 있다면 #}
             <div class="row"> {# 블로그 태그와 사진 태그 박스를 나란히 두기 위한 row #}
@@ -17,7 +17,8 @@
                         <div class="d-flex flex-wrap"> {# 태그들을 유연하게 배치 #}
                             {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
                                 {% if tag.num_blog_posts > 0 %} {# 블로그 게시물에 연결된 태그만 표시 #}
-                                    <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}" 
+                                    {# 'blog:post_list_by_tag'를 'blog:post_tag_list'로 변경합니다. #}
+                                    <a href="{% url 'blog:post_tag_list' tag_slug=tag.slug %}" 
                                        class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
                                        style="font-size: {{ tag.num_blog_posts|add:10 }}px; min-width: 80px; text-align: center;"> {# 블로그 게시물 수에 따라 폰트 크기 조절 #}
                                         {{ tag.name }} 

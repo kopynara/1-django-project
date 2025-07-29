@@ -18,7 +18,7 @@
                                 <a href="{% url 'blog:post_year_archive' year=date.year %}?next=archive" class="fs-5 text-decoration-none text-dark">
                                     {{ date.year }}년
                                 </a>
-                                {# 해당 연도의 게시물 개수를 표시 #}
+                                {# 해당 연도의 게시물 개수를 표시 (posts_by_year 컨텍스트 변수를 활용) #}
                                 <span class="badge bg-primary rounded-pill">
                                     {{ date.num_posts }}
                                 </span>
@@ -39,8 +39,8 @@
             <ul class="list-group list-group-flush">
                 {% for post in posts %}
                     <li class="list-group-item">
-                        {# 게시물 제목 링크에 ?next=archive 추가 (URL 이름 post_detail로 변경) #}
-                        <a href="{% url 'blog:post_detail' slug=post.slug %}?next=archive" class="text-decoration-none text-dark">
+                        {# 게시물 제목 링크에 ?next=archive 추가 #}
+                        <a href="{{ post.get_absolute_url }}?next=archive" class="text-decoration-none text-dark">
                             {{ post.title }}
                         </a>
                         <small class="text-muted ms-2">{{ post.created_at|date:"Y.m.d" }}</small>

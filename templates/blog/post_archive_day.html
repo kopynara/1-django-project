@@ -1,0 +1,33 @@
+{# templates/blog/post_archive_day.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}블로그 {{ year }}년 {{ month_name }} {{ day }}일 아카이브{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="mb-4">블로그 {{ year }}년 {{ month_name }} {{ day }}일 아카이브</h1>
+
+        {% if object_list %} {# 해당 일의 게시물 목록 #}
+            <h2 class="mt-4 mb-3">게시물</h2>
+            <ul class="list-group list-group-flush">
+                {% for post in object_list %}
+                    <li class="list-group-item">
+                        <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-decoration-none text-dark">
+                            {{ post.title }}
+                        </a>
+                        <small class="text-muted ms-2">{{ post.created_at|date:"Y.m.d H:i" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                {{ year }}년 {{ month_name }} {{ day }}일에 작성된 게시물이 없습니다.
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <a href="{% url 'blog:post_month_archive' year=year month=month_number %}" class="btn btn-secondary">{{ month_name }} 아카이브로 돌아가기</a>
+        </div>
+    </div>
+{% endblock content %}

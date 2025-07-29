@@ -1,0 +1,47 @@
+{# templates/blog/post_archive_year.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}블로그 {{ year }}년 아카이브{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="mb-4">블로그 {{ year }}년 아카이브</h1>
+        
+        {# 해당 연도의 월별 목록을 여기에 표시할 수 있습니다 (나중에 추가). #}
+        {# 예시:
+        {% if month_list %}
+            <h3>월별 목록</h3>
+            <ul class="list-group mb-4">
+                {% for month in month_list %}
+                    <li class="list-group-item">
+                        <a href="{% url 'blog:post_month_archive' year=year month=month.month|date:'m' %}">{{ month|date:'F' }} ({{ month.num_posts }} 게시물)</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        #}
+
+        {% if object_list %} {# 해당 연도의 게시물 목록 #}
+            <h2 class="mt-4 mb-3">게시물</h2>
+            <ul class="list-group list-group-flush">
+                {% for post in object_list %}
+                    <li class="list-group-item">
+                        <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-decoration-none text-dark">
+                            {{ post.title }}
+                        </a>
+                        <small class="text-muted ms-2">{{ post.created_at|date:"Y.m.d" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                {{ year }}년에 작성된 게시물이 없습니다.
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <a href="{% url 'blog:post_archive' %}" class="btn btn-secondary">전체 아카이브로 돌아가기</a>
+        </div>
+    </div>
+{% endblock content %}
