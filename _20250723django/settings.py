@@ -60,8 +60,8 @@ ROOT_URLCONF = '_20250723django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # 프로젝트 전체 템플릿 폴더 추가 (pathlib 스타일)
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'], # 모든 템플릿을 이 프로젝트 전역 폴더에서 찾도록 설정
+        'APP_DIRS': True, # 각 앱 내부의 'templates' 폴더는 더 이상 자동으로 탐색하지 않음
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -72,6 +72,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = '_20250723django.wsgi.application'
 
