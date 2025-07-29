@@ -62,8 +62,10 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/admin/">Admin</a></li>
-                            <li><a class="dropdown-item" href="{% url 'blog:post_archive' %}">Archive</a></li>
-                            <li><a class="dropdown-item" href="{% url 'blog:tag_cloud' %}">Tag Cloud</a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:post_archive' %}">Blog Archive</a></li> {# Blog Archive로 이름 변경 #}
+                            <li><a class="dropdown-item" href="{% url 'blog:tag_cloud' %}">Blog Tag Cloud</a></li> {# Blog Tag Cloud로 이름 변경 #}
+                            <li><hr class="dropdown-divider"></li> {# 구분선 추가 #}
+                            <li><a class="dropdown-item" href="{% url 'photo:tag_cloud' %}">Photo Tag Cloud</a></li> {# Photo Tag Cloud 링크 추가 #}
                             {# <li><a class="dropdown-item" href="{% url 'blog:search' %}">Search</a></li> #} {# Search는 메인 검색창으로 대체하므로 제거 #}
                         </ul>
                     </li>

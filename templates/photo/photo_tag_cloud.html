@@ -1,0 +1,27 @@
+{% extends 'base.html' %} {# base.html 템플릿을 상속받습니다. #}
+
+{% block title %}사진 태그 클라우드{% endblock %} {# 페이지 제목을 설정합니다. #}
+
+{% block content %} {# base.html의 content 블록에 이 내용을 삽입합니다. #}
+    <div class="container my-4">
+        <h1 class="mb-4">사진 태그 클라우드</h1>
+
+        {% if tags %} {# views.py에서 전달받은 'tags' 객체가 있다면 #}
+            <div class="d-flex flex-wrap"> {# 태그들을 유연하게 배치 #}
+                {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
+                    {# 각 태그에 대한 링크를 생성합니다. #}
+                    {# 'photo_list_by_tag' URL은 특정 태그가 달린 사진 목록을 보여줍니다. #}
+                    <a href="{% url 'photo:photo_list_by_tag' tag_slug=tag.slug %}" 
+                       class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
+                       style="font-size: {{ tag.num_times|add:10 }}px;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
+                        {{ tag.name }} ({{ tag.num_times }}) {# 태그 이름과 사용 횟수 표시 #}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                아직 등록된 태그가 없습니다.
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

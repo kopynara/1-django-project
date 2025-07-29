@@ -8,65 +8,52 @@
         <h1 class="mb-3">{{ photo.title }}</h1> {# 사진 제목 #}
         <p class="text-muted small mb-3">
             <i class="far fa-calendar-alt"></i> {{ photo.created_at|date:"Y.m.d H:i" }}
-            {% if photo.author %} | <i class="fas fa-user"></i> {{ photo.author }}{% endif %}
-            {% if photo.updated_at %} | <i class="fas fa-edit"></i> 수정일: {{ photo.updated_at|date:"Y.m.d H:i" }}{% endif %}
+            {% if photo.owner %} | <i class="fas fa-user"></i> {{ photo.owner }}{% endif %}
         </p>
 
-        {# 태그 표시 섹션 #}
+        <div class="row mb-4">
+            <div class="col-md-8 offset-md-2">
+                {% if photo.image %}
+                    <img src="{{ photo.image.url }}" class="img-fluid rounded-3 shadow-sm" alt="{{ photo.title }}">
+                {% else %}
+                    {# 이미지가 없을 경우 대체 이미지 또는 플레이스홀더 #}
+                    <img src="https://placehold.co/800x600/cccccc/333333?text=No+Image" class="img-fluid rounded-3 shadow-sm" alt="No Image">
+                {% endif %}
+            </div>
+        </div>
+
+        {# 태그 표시 섹션 시작 #}
         {% if photo.tags.all %} {# 사진에 태그가 있다면 #}
-            <div class="tags-section mb-4"> {# 태그 섹션에 아래쪽 마진을 추가합니다. #}
+            <div class="tags-section mb-4 text-center"> {# 태그 섹션에 아래쪽 마진을 추가합니다. #}
                 <i class="fas fa-tags me-1"></i>
                 {% for tag in photo.tags.all %} {# 각 태그를 순회합니다. #}
-                    {# 태그 클릭 시 해당 태그가 달린 사진 목록으로 이동하는 링크 (아직 구현 안됨) #}
-                    <span class="badge bg-info text-dark me-1 mb-1 rounded-pill">
+                    {# 태그 클릭 시 해당 태그가 달린 사진 목록으로 이동하는 링크 #}
+                    <a href="{% url 'photo:photo_list_by_tag' tag_slug=tag.slug %}"
+                       class="badge bg-info text-dark me-1 mb-1 rounded-pill">
                         {{ tag.name }}
-                    </span>
+                    </a>
                 {% endfor %}
             </div>
         {% endif %}
         {# 태그 표시 섹션 끝 #}
 
-        <div class="text-center mb-5"> {# 이미지를 중앙 정렬 #}
-            {% if photo.image %}
-                {# 최대 너비를 100%로 설정하여 반응형 이미지로 만듭니다. #}
-                <img src="{{ photo.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ photo.title }}" style="max-width: 800px; height: auto;">
-            {% else %}
-                {# 이미지가 없을 경우 플레이스홀더 이미지 #}
-                <img src="https://placehold.co/800x600/cccccc/333333?text=No+Image" class="img-fluid rounded shadow-sm" alt="No Image">
-            {% endif %}
-        </div>
-
-        <div class="photo-description mb-5"> {# 사진 설명에 아래쪽 마진을 추가합니다. #}
-            <p>{{ photo.description|linebreaksbr }}</p> {# 줄바꿈을 HTML <br> 태그로 변환 #}
+        <div class="photo-description mb-5 text-center"> {# 사진 설명에 아래쪽 마진을 추가합니다. #}
+            <p class="lead">{{ photo.description }}</p> {# 사진 설명 #}
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-5"> {# 버튼들을 양쪽 끝으로 정렬 #}
-            <a href="{% url 'photo:index' %}" class="btn btn-secondary">갤러리로 돌아가기</a> {# 목록으로 돌아가는 버튼 #}
+            {# "목록으로 돌아가기" 버튼 URL을 동적으로 변경 #}
+            {% if request.GET.next == 'index' %}
+                <a href="{% url 'photo:index' %}" class="btn btn-secondary">목록으로 돌아가기</a>
+            {% elif request.GET.next == 'photo_archive' %} {# photo 앱에 아카이브 뷰가 있다면 #}
+                <a href="{% url 'photo:photo_archive' %}" class="btn btn-secondary">목록으로 돌아가기</a>
+            {% else %}
+                {# 기본값: photo 앱의 인덱스 페이지로 돌아가기 #}
+                <a href="{% url 'photo:index' %}" class="btn btn-secondary">목록으로 돌아가기</a>
+            {% endif %}
             {# 이전/다음 사진 링크 (필요시 추가) #}
             {# <a href="#" class="btn btn-outline-primary">이전 사진</a> #}
             {# <a href="#" class="btn btn-outline-primary">다음 사진</a> #}
         </div>
-
-        {# Disqus 댓글 섹션 (선택 사항, 필요시 추가) #}
-        {# 블로그와 동일하게 Disqus 댓글을 사진 상세 페이지에도 추가할 수 있습니다. #}
-        {# <hr class="my-5"> #}
-        {# <h2 class="mb-4">댓글</h2> #}
-        {# <div id="disqus_thread"></div> #}
-        {# <script> #}
-        {#     var disqus_config = function () { #}
-        {#     this.page.url = "{{ request.build_absolute_uri }}"; #}
-        {#     this.page.identifier = "photo-{{ photo.id }}"; #}
-        {#     this.page.title = "{{ photo.title }}"; #}
-        {#     }; #}
-        {#     (function() { #}
-        {#     var d = document, s = d.createElement('script'); #}
-        {#     s.src = 'https://kopynara.disqus.com/embed.js'; #}
-        {#     s.setAttribute('data-timestamp', +new Date()); #}
-        {#     (d.head || d.body).appendChild(s); #}
-        {#     })(); #}
-        {# </script> #}
-        {# <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript> #}
-        {# Disqus 댓글 섹션 끝 #}
-
     </div>
 {% endblock content %}
