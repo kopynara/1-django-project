@@ -9,14 +9,9 @@ class Post(models.Model):
     description = models.CharField(verbose_name='DESCRIPTION', max_length=100, blank=True, help_text='simple description text.')
     content = models.TextField(verbose_name='CONTENT')
     
-    # create_dt를 created_at으로 이름 변경하여 admin.py와 일치시킵니다.
     created_at = models.DateTimeField(verbose_name='CREATE DATE', auto_now_add=True)
     modify_dt = models.DateTimeField(verbose_name='MODIFY DATE', auto_now=True)
     
-    # author 필드 추가: Django의 기본 User 모델과 연결합니다.
-    # on_delete=models.CASCADE: 사용자가 삭제되면 해당 사용자의 게시물도 함께 삭제됩니다.
-    # related_name='blog_posts': User 객체에서 해당 사용자의 블로그 게시물들을 역참조할 때 사용합니다.
-    # verbose_name: Admin 페이지 등에서 사용자에게 보여줄 이름입니다.
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -29,19 +24,18 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'post' # 단수 별칭
         verbose_name_plural = 'posts' # 복수 별칭
-        db_table = 'my_post' # 데이터베이스 테이블 이름 지정 (기존 'blog_posts'에서 'my_post'로 변경)
-        ordering = ('-created_at',) # 기본 정렬 순서 (최신 생성일 기준 내림차순으로 변경)
+        db_table = 'my_post' # 데이터베이스 테이블 이름 지정
+        ordering = ('-created_at',) # 기본 정렬 순서
 
     def __str__(self):
         return self.title # 객체를 문자열로 표현할 때 title 필드를 반환
 
     def get_absolute_url(self):
-        return reverse('blog:detail', args=(self.slug,)) # slug 기반 URL (URL 패턴 이름 'detail'로 변경)
+        # blog:detail -> blog:post_detail로 변경
+        return reverse('blog:post_detail', args=(self.slug,)) # slug 기반 URL (URL 패턴 이름 'post_detail'로 변경)
 
     def get_previous_post(self):
-        # created_at으로 변경되었으므로 get_previous_by_created_at() 사용
         return self.get_previous_by_created_at() # 이전 게시물 가져오기
 
     def get_next_post(self):
-        # created_at으로 변경되었으므로 get_next_by_created_at() 사용
         return self.get_next_by_created_at() # 다음 게시물 가져오기

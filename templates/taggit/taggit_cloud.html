@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {# base.html 템플릿을 상속받습니다. #}
 
-{% block title %}Tag Cloud{% endblock %} {# 페이지 제목을 Tag Cloud로 설정합니다. #}
+{% block title %}태그 클라우드{% endblock %} {# 페이지 제목을 Tag Cloud로 설정합니다. #}
 
 {% block content %} {# base.html의 content 블록에 이 내용을 삽입합니다. #}
     <div class="container my-4">
@@ -10,8 +10,8 @@
             <div class="d-flex flex-wrap"> {# 태그들을 유연하게 배치 #}
                 {% for tag in tags %} {# 각 태그 객체를 순회합니다. #}
                     {# 각 태그에 대한 링크를 생성합니다. #}
-                    {# 'post_tag_list' URL은 특정 태그가 달린 게시물 목록을 보여줍니다. #}
-                    <a href="{% url 'blog:post_tag_list' tag=tag.name %}" 
+                    {# 'post_list_by_tag' URL은 특정 태그가 달린 게시물 목록을 보여줍니다. #}
+                    <a href="{% url 'blog:post_list_by_tag' tag_slug=tag.slug %}" {# <-- 이 부분을 tag_slug=tag.slug으로 변경하고 URL 이름도 post_list_by_tag로 변경 #}
                        class="badge bg-primary text-white me-2 mb-2 p-2 rounded-pill" 
                        style="font-size: {{ tag.num_times|add:10 }}px;"> {# 태그 사용 횟수에 따라 폰트 크기 조절 (예시) #}
                         {{ tag.name }} ({{ tag.num_times }}) {# 태그 이름과 사용 횟수 표시 #}

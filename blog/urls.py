@@ -5,13 +5,14 @@ app_name = 'blog' # 앱의 네임스페이스 설정
 
 urlpatterns = [
     # /blog/ (모든 게시물 목록 페이지)
-    path('', views.PostLV.as_view(), name='index'), # PostLV 뷰 사용 (기존 'index' 이름 유지)
+    path('', views.PostListView.as_view(), name='index'), # PostLV -> PostListView
     
     # /blog/post/ (게시물 목록 페이지, index와 동일)
-    path('post/', views.PostLV.as_view(), name='post_list'), 
+    path('post/', views.PostListView.as_view(), name='post_list'), # PostLV -> PostListView
     
     # /blog/post/django-example/ (slug 기반 상세 페이지)
-    re_path(r'^post/(?P<slug>[-\w]+)/$', views.PostDV.as_view(), name='detail'), 
+    # PostDV -> PostDetailView로 변경, URL 이름도 'detail' -> 'post_detail'로 변경
+    re_path(r'^post/(?P<slug>[-\w]+)/$', views.PostDetailView.as_view(), name='post_detail'), 
     
     # /blog/archive/ (최근 게시물 아카이브)
     path('archive/', views.PostAV.as_view(), name='post_archive'), 
@@ -32,8 +33,9 @@ urlpatterns = [
     path('tag/', views.TagCloudTV.as_view(), name='tag_cloud'), 
     
     # /blog/tag/tagname/ (특정 태그 게시물 목록)
-    # PostTOL 뷰를 사용하여 태그 이름으로 필터링된 목록을 보여줍니다.
-    path('tag/<str:tag>/', views.PostTOL.as_view(), name='post_tag_list'), 
+    # PostListView 뷰를 사용하여 태그 이름으로 필터링된 목록을 보여줍니다.
+    # URL 이름을 'post_list_by_tag'로 변경하고, 인자 이름을 'tag_slug'로 변경합니다.
+    path('tag/<slug:tag_slug>/', views.PostListView.as_view(), name='post_list_by_tag'), 
     
     # /blog/search/ (검색 페이지)
     path('search/', views.SearchFV.as_view(), name='search'), 

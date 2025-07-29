@@ -1,108 +1,196 @@
-# blog/views.py
-
-from django.shortcuts import render # 필요한 경우를 위해 임포트 유지
-from django.views.generic import ListView, DetailView, TemplateView # TemplateView 추가
-from django.views.generic.dates import ArchiveIndexView, YearArchiveView, MonthArchiveView, DayArchiveView, TodayArchiveView # 날짜 기반 아카이브 뷰 임포트
-from django.db.models import Q # 검색 기능을 위해 Q 객체 임포트
-from taggit.models import Tag # taggit의 Tag 모델 임포트
-
+from django.shortcuts import render
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from blog.models import Post # Post 모델 임포트
+from taggit.models import Tag # Tag 모델 임포트 (django-taggit에서 제공)
+from django.db import models # <-- 이 줄을 추가합니다. (models.Count 사용을 위해)
+from django.db.models import Q # 검색 기능을 위해 Q 객체 임포트
+from django.utils import timezone # PostTAV 뷰에서 오늘 날짜를 가져오기 위해 임포트
 
-#--- ListView (Post 목록) ---
-class PostLV(ListView):
+class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
-    context_object_name = 'posts' # 템플릿에서 사용할 객체 리스트의 변수명
-    paginate_by = 2 # 한 페이지에 보여줄 게시물 수
-    queryset = Post.objects.all().prefetch_related('tags') # 태그를 미리 가져와서 N+1 쿼리 방지
+    context_object_name = 'posts' # 템플릿에서 게시물 목록을 'posts'로 접근
+    paginate_by = 10 # 한 페이지에 10개의 게시물 표시
 
-#--- DetailView (Post 상세) ---
-class PostDV(DetailView):
+    def get_queryset(self):
+        # 기본 쿼리셋: 모든 게시물을 최신 생성일 기준으로 정렬
+        queryset = super().get_queryset().order_by('-created_at')
+
+        # URL에서 tag_slug 파라미터 가져오기
+        tag_slug = self.kwargs.get('tag_slug')
+
+        if tag_slug:
+            # tag_slug가 있다면 해당 태그가 달린 게시물만 필터링
+            try:
+                tag = Tag.objects.get(slug=tag_slug)
+                queryset = queryset.filter(tags__in=[tag])
+                self.tag_name = tag.name # 템플릿에 태그 이름 전달을 위해 저장
+            except Tag.DoesNotExist:
+                # 해당 태그가 존재하지 않을 경우 빈 쿼리셋 반환
+                queryset = Post.objects.none()
+                self.tag_name = None # 태그 이름 없음
+        else:
+            self.tag_name = None # 태그 슬러그가 없으면 태그 이름 없음
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 태그 이름이 있다면 컨텍스트에 추가하여 템플릿으로 전달
+        if self.tag_name:
+            context['tagname'] = self.tag_name # 템플릿에서 'tagname'으로 접근
+        return context
+
+class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
-    context_object_name = 'post' # 템플릿에서 사용할 객체 단일의 변수명
+    context_object_name = 'post' # 템플릿에서 게시물 객체를 'post'로 접근
 
-#--- Archive View (최근 게시물 아카이브) ---
-class PostAV(ArchiveIndexView):
+# PostAV (Archive View): 월별/연도별 아카이브 목록을 보여줍니다.
+class PostAV(ListView):
     model = Post
-    date_field = 'modify_dt' # 날짜 필드 지정
     template_name = 'blog/post_archive.html'
     context_object_name = 'posts'
-    paginate_by = 2
+    date_field = 'created_at'
+    paginate_by = 10
+    allow_empty = True
 
-#--- Year Archive View (연도별 아카이브) ---
-class PostYAV(YearArchiveView):
-    model = Post
-    date_field = 'modify_dt'
-    make_object_list = True # 해당 연도의 모든 객체를 리스트로 전달
-    template_name = 'blog/post_archive_year.html'
-    context_object_name = 'posts'
-
-#--- Month Archive View (월별 아카이브) ---
-class PostMAV(MonthArchiveView):
-    model = Post
-    date_field = 'modify_dt'
-    month_format = '%m' # 월 포맷 지정 (예: 01, 02...)
-    template_name = 'blog/post_archive_month.html'
-    context_object_name = 'posts'
-
-#--- Day Archive View (일별 아카이브) ---
-class PostDAV(DayArchiveView):
-    model = Post
-    date_field = 'modify_dt'
-    month_format = '%m' # 월 포맷 지정
-    template_name = 'blog/post_archive_day.html'
-    context_object_name = 'posts'
-
-#--- Today Archive View (오늘 날짜 아카이브) ---
-class PostTAV(TodayArchiveView):
-    model = Post
-    date_field = 'modify_dt'
-    template_name = 'blog/post_archive_day.html' # 오늘 날짜도 일별 아카이브 템플릿 사용
-    context_object_name = 'posts'
-
-#--- Tag Cloud View (태그 클라우드) ---
-class TagCloudTV(TemplateView):
-    template_name = 'taggit/taggit_cloud.html' # taggit에서 제공하는 기본 템플릿
+    def get_queryset(self):
+        return super().get_queryset().order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 모든 태그를 이름 순으로 정렬하여 컨텍스트에 추가
-        context['tags'] = Tag.objects.all().order_by('name')
+        context['date_list'] = Post.objects.dates('created_at', 'year', order='DESC')
         return context
 
-#--- Post List by Tag View (특정 태그별 게시물 목록) ---
-class PostTOL(ListView):
+# PostYAV (Year Archive View): 특정 연도의 게시물 목록을 보여줍니다.
+class PostYAV(ListView):
+    model = Post
+    template_name = 'blog/post_archive.html'
+    context_object_name = 'posts'
+    date_field = 'created_at'
+    paginate_by = 10
+    allow_empty = True
+    year_format = '%Y'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(created_at__year=self.kwargs['year']).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['date_list'] = Post.objects.dates('created_at', 'year', order='DESC')
+        context['year'] = self.kwargs['year']
+        return context
+
+# PostMAV (Month Archive View): 특정 월의 게시물 목록을 보여줍니다.
+class PostMAV(ListView):
+    model = Post
+    template_name = 'blog/post_archive.html'
+    context_object_name = 'posts'
+    date_field = 'created_at'
+    paginate_by = 10
+    allow_empty = True
+    month_format = '%m'
+    year_format = '%Y'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            created_at__year=self.kwargs['year'],
+            created_at__month=self.kwargs['month']
+        ).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['date_list'] = Post.objects.dates('created_at', 'year', order='DESC')
+        context['year'] = self.kwargs['year']
+        context['month'] = self.kwargs['month']
+        return context
+
+# PostDAV (Day Archive View): 특정 일의 게시물 목록을 보여줍니다.
+class PostDAV(ListView):
+    model = Post
+    template_name = 'blog/post_archive.html'
+    context_object_name = 'posts'
+    date_field = 'created_at'
+    paginate_by = 10
+    allow_empty = True
+    day_format = '%d'
+    month_format = '%m'
+    year_format = '%Y'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            created_at__year=self.kwargs['year'],
+            created_at__month=self.kwargs['month'],
+            created_at__day=self.kwargs['day']
+        ).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['date_list'] = Post.objects.dates('created_at', 'year', order='DESC')
+        context['year'] = self.kwargs['year']
+        context['month'] = self.kwargs['month']
+        context['day'] = self.kwargs['day']
+        return context
+
+# PostTAV (Today Archive View): 오늘 날짜의 게시물 목록을 보여줍니다.
+class PostTAV(ListView):
+    model = Post
+    template_name = 'blog/post_archive.html'
+    context_object_name = 'posts'
+    date_field = 'created_at'
+    paginate_by = 10
+    allow_empty = True
+
+    def get_queryset(self):
+        today = timezone.localdate()
+        return super().get_queryset().filter(
+            created_at__year=today.year,
+            created_at__month=today.month,
+            created_at__day=today.day
+        ).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['date_list'] = Post.objects.dates('created_at', 'year', order='DESC')
+        context['today'] = timezone.localdate()
+        return context
+
+# TagCloudTV (Tag Cloud View): 모든 태그를 보여줍니다.
+class TagCloudTV(ListView):
+    template_name = 'taggit/taggit_cloud.html'
+    context_object_name = 'tags'
+
+    def get_queryset(self):
+        return Tag.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 각 태그의 사용 횟수를 계산하여 'tags' 리스트에 추가합니다.
+        tags_with_counts = Tag.objects.annotate(num_times=models.Count('taggit_taggeditem_items'))
+        context['tags'] = tags_with_counts
+        return context
+
+# SearchFV (Search Form View): 검색 결과를 보여줍니다.
+class SearchFV(ListView):
+    model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    paginate_by = 2
+    paginate_by = 10
 
     def get_queryset(self):
-        # URL에서 'tag' 파라미터를 가져와 해당 태그를 가진 게시물 필터링
-        tag = self.kwargs.get('tag')
-        return Post.objects.filter(tags__name=tag).prefetch_related('tags')
+        search_keyword = self.request.GET.get('q', '')
+        if search_keyword:
+            return Post.objects.filter(
+                Q(title__icontains=search_keyword) |
+                Q(content__icontains=search_keyword) |
+                Q(description__icontains=search_keyword) |
+                Q(tags__name__icontains=search_keyword)
+            ).distinct().order_by('-created_at')
+        return Post.objects.all().order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tagname'] = self.kwargs.get('tag') # 현재 태그 이름을 템플릿에 전달
-        return context
-
-#--- Search Form View (검색 폼) ---
-class SearchFV(ListView):
-    paginate_by = 5 # 검색 결과 페이지당 5개 게시물
-    template_name = 'blog/post_list.html' # 검색 결과도 post_list 템플릿 사용
-    context_object_name = 'posts'
-
-    def get_queryset(self):
-        # URL 쿼리 파라미터에서 'q' 값을 가져옴 (검색어)
-        q = self.request.GET.get('q', '')
-        if q:
-            # 제목(title) 또는 내용(content)에 검색어가 포함된 게시물 검색
-            # Q 객체를 사용하여 OR 조건 검색, distinct()로 중복 제거
-            return Post.objects.filter(Q(title__icontains=q) | Q(content__icontains=q)).distinct()
-        return Post.objects.none() # 검색어가 없으면 빈 쿼리셋 반환
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['q'] = self.request.GET.get('q', '') # 템플릿에 검색어 전달
+        context['search_query'] = self.request.GET.get('q', '')
         return context

@@ -1,11 +1,52 @@
-{% extends 'base.html' %} {# base.html을 상속받아 메뉴바를 가져옵니다. #}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Blog Archive{% endblock %}
+{% block title %}블로그 아카이브{% endblock %}
 
 {% block content %}
     <div class="container my-4">
-        <h1>Blog Archives</h1>
-        <p>This page will display a list of archived blog posts.</p>
-        {# 나중에 여기에 월별/년도별 아카이브 목록을 표시하는 코드를 추가합니다. #}
+        <h1 class="mb-4">블로그 아카이브</h1>
+
+        {% if date_list %} {# date_list는 ArchiveIndexView에서 제공하는 날짜 목록입니다. #}
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <ul class="list-group list-group-flush">
+                        {% for date in date_list %} {# 각 연도 (또는 월)를 순회합니다. #}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {# date는 datetime.date 객체이므로, year 속성으로 연도를 가져올 수 있습니다. #}
+                                {# 연도별 아카이브 링크에도 ?next=archive 추가 (선택 사항, 필요시) #}
+                                <a href="{% url 'blog:post_year_archive' year=date.year %}?next=archive" class="fs-5 text-decoration-none text-dark">
+                                    {{ date.year }}년
+                                </a>
+                                {# 해당 연도의 게시물 개수를 표시 #}
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ date.num_posts }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                아직 아카이브된 게시물이 없습니다.
+            </div>
+        {% endif %}
+
+        {# 선택 사항: 최근 게시물 목록을 아카이브 페이지 하단에 표시 #}
+        {% if posts %} {# ArchiveIndexView에서 make_object_list=True일 때 제공되는 전체 게시물 목록 #}
+            <h2 class="mt-5 mb-3">모든 게시물</h2>
+            <ul class="list-group list-group-flush">
+                {% for post in posts %}
+                    <li class="list-group-item">
+                        {# 게시물 제목 링크에 ?next=archive 추가 (URL 이름 post_detail로 변경) #}
+                        <a href="{% url 'blog:post_detail' slug=post.slug %}?next=archive" class="text-decoration-none text-dark">
+                            {{ post.title }}
+                        </a>
+                        <small class="text-muted ms-2">{{ post.created_at|date:"Y.m.d" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
-{% endblock %}
+{% endblock content %}
