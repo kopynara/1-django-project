@@ -14,5 +14,9 @@ urlpatterns = [
     # 태그별 사진 목록 페이지 (PhotoLV 재사용)
     # URL: /photo/tag/tagname/ (특정 태그가 달린 사진)
     # [-\w]+는 유니코드 단어 문자(한글 포함), 숫자, 하이픈, 언더스코어를 모두 매칭합니다.
-    re_path(r'^tag/(?P<tag_slug>[-\w]+)/$', PhotoLV.as_view(), name='photo_list_by_tag'),
+    # 이전에 제거했던 것을 다시 추가합니다.
+    re_path(r'^tag/(?P<tag_slug>[-\w\uAC00-\uD7A3]+)/$', PhotoLV.as_view(), name='photo_list_by_tag'),
+
+    # 아래 PhotoTagCloudTV 관련 URL 패턴은 이제 사용하지 않으므로 제거합니다.
+    # path('tagcloud/', PhotoTagCloudTV.as_view(), name='tagcloud'),
 ]
