@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'bookmark.apps.BookmarkConfig', # bookmark 앱 등록
     'blog.apps.BlogConfig', # blog 앱 등록
     'photo.apps.PhotoConfig', # photo 앱 등록 (PhotoConfig 클래스 사용)
+    'tag_cloud.apps.TagCloudConfig', # 새로 생성한 tag_cloud 앱 등록
 ]
 
 MIDDLEWARE = [
@@ -60,8 +61,8 @@ ROOT_URLCONF = '_20250723django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # 모든 템플릿을 이 프로젝트 전역 폴더에서 찾도록 설정
-        'APP_DIRS': True, # 각 앱 내부의 'templates' 폴더는 더 이상 자동으로 탐색하지 않음
+        'DIRS': [BASE_DIR / 'templates'], # 프로젝트 전체 템플릿 폴더 추가 (pathlib 스타일)
+        'APP_DIRS': True, # 각 앱 내부의 'templates' 폴더도 자동으로 탐색하도록 유지
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -72,7 +73,6 @@ TEMPLATES = [
         },
     },
 ]
-
 
 WSGI_APPLICATION = '_20250723django.wsgi.application'
 
@@ -139,4 +139,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # 로그인 성공 후 리다이렉트될 URL (인증 기능 구현 시 사용)
 # LOGIN_REDIRECT_URL = '/' # 홈페이지로 리다이렉트
 # LOGOUT_REDIRECT_URL = '/' # 로그아웃 후 홈페이지로 리다이렉트
-
